@@ -28,6 +28,7 @@ module.exports = {
             }
             return false;
         } catch (err) {
+            logger.error(err.message);
             return false;
         }
     },
@@ -52,6 +53,7 @@ module.exports = {
             }
             return false;
         } catch (err) {
+            logger.error(err.message);
             return false;
         }
     },
@@ -82,7 +84,7 @@ module.exports = {
     //         }
     //         return false;
     //     } catch (err) {
-    //         console.log(err);
+    //         logger.error(err.message);
     //         return false;
     //     }
     // },
@@ -107,6 +109,7 @@ module.exports = {
             }
             return false;
         } catch (err) {
+            logger.error(err.message);
             return false;
         }
     },

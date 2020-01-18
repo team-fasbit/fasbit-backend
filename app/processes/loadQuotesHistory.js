@@ -61,7 +61,6 @@ module.exports = async () => {
             }
         }
     } catch (err) {
-        console.log(err);
         logger.error('Error while processing loadQuotesHistory');
     }
 
