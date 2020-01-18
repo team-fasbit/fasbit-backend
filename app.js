@@ -8,11 +8,16 @@ var mongoose = require('mongoose');
 require('dotenv').config();
 
 (async () => {
-    await mongoose.connect(`mongodb://${process.env.DB_HOST}/${process.env.DB_NAME}`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true
-    });
+    console.log(`connecting to mongodb://${process.env.DB_HOST}/${process.env.DB_NAME}`);
+    try {
+        await mongoose.connect(`mongodb://${process.env.DB_HOST}/${process.env.DB_NAME}`, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useCreateIndex: true
+        });
+    } catch (err) {
+        console.error(err);
+    }
 })();
 
 var indexRouter = require('./app/routes/index');
