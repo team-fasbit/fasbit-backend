@@ -38,4 +38,16 @@ router.post('/delete-ohlcv', async function (req, res, next) {
     res.send('delete-ohlcv');
 });
 
+router.post('/list-ohlcv', async function (req, res, next) {
+    const ohlcvs = await Ohlcv.aggregate([{
+        "$group": {
+            _id: "$last_updated",
+            count: { $sum: 1 }
+        }
+    }, {
+        $sort: { "_id": 1 }
+    }]).exec();
+    res.send(ohlcvs);
+});
+
 module.exports = router;
