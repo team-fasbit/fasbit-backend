@@ -133,7 +133,6 @@ module.exports = {
             });
 
             if (result && result.data && result.status && result.status.error_code != undefined && result.status.error_code === 0) {
-                logger.info('ohlcvHistorical called');
                 return result.data;
             } else if (result.status && result.status.error_message) {
                 logger.error(result.status.error_message);
