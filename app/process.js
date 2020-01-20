@@ -9,7 +9,7 @@ var loadQuotes = require('./processes/loadQuotes');
 module.exports = () => {
     if (process.env.RUN_PROCESS == "TRUE") {
         // Every Minute
-        new CronJob('* * * * *', loadOhlcv, null, true);
+        new CronJob('*/5 * * * *', loadOhlcv, null, true);
         logger.info('loadOhlcv process initialized');
 
         // Once Every Sunday

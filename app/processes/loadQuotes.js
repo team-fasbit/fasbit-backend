@@ -1,3 +1,5 @@
+var sleep = require('sleep');
+
 var logger = require('../helpers/logger');
 var coinMarketCapAPI = require('../helpers/coinMarketCapAPI');
 
@@ -5,6 +7,7 @@ var Coin = require('../models/Coin');
 var Quote = require('../models/Quote');
 
 module.exports = async () => {
+    sleep.msleep(2500);
     logger.info('loadQuotes process start');
 
     try {
