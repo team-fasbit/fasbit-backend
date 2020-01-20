@@ -17,7 +17,7 @@ module.exports = () => {
         logger.info('refreshTop500 process initialized');
 
         // Once Every Sunday
-        new CronJob('*/5 * * * *', loadQuotes, null, true);
-        logger.info('loadQuotes process initialized');
+        // new CronJob('*/5 * * * *', loadQuotes, null, true);
+        // logger.info('loadQuotes process initialized');
     }
 };
