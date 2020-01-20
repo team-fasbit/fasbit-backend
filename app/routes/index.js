@@ -39,7 +39,7 @@ router.post('/delete-ohlcv', async function (req, res, next) {
 });
 
 router.post('/list-ohlcv', async function (req, res, next) {
-    const ohlcvs = await Ohlcv.find().sort({ _id: -1 }).limit(100000).exec();
+    const ohlcvs = await Ohlcv.find().sort({ _id: -1 }).limit(10000).exec();
     res.send(ohlcvs);
 });
 
