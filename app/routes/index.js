@@ -39,18 +39,7 @@ router.post('/delete-ohlcv', async function (req, res, next) {
 });
 
 router.post('/list-ohlcv', async function (req, res, next) {
-    const ohlcvs = await Ohlcv.aggregate([{
-        "$group": {
-            _id: {
-                time_open: "$time_open",
-                time_close: "$time_close",
-                last_updated: "$last_updated"
-            },
-            count: { $sum: 1 }
-        }
-    }, {
-        $sort: { "_id.time_open": 1, "_id.last_updated": 1 }
-    }]).exec();
+    const ohlcvs = await Ohlcv.find().sort({ _id: -1 }).limit(100000).exec();
     res.send(ohlcvs);
 });
 
