@@ -87,10 +87,6 @@ router.post('/list-ohlcv', async function (req, res, next) {
     //         "last_updated": 1,
     //         "coin": { $arrayElemAt: ["$coin", 0] }
     //     }
-    }, {
-        $addFields: {
-            "entry_datetime": { $toDate: "$_id" }
-        }
     }]).exec();
 
     res.json(ohlcvs);
