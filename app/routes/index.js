@@ -52,7 +52,7 @@ router.post('/list-ohlcv', async function (req, res, next) {
     }
 
     const coin = await Coin.findOne({ symbol: symbol }).exec();
-    
+
     if (!coin) {
         res.status(404).json('Symbol not found');
         return;
@@ -68,25 +68,41 @@ router.post('/list-ohlcv', async function (req, res, next) {
         $skip: skip
     }, {
         $limit: limit
-    // }, {
-    //     $lookup: {
-    //         from: 'coins',
-    //         localField: 'coin_id',
-    //         foreignField: '_id',
-    //         as: 'coin'
-    //     }
-    // }, {
-    //     $project: {
-    //         "time_open": 1,
-    //         "time_close": 1,
-    //         "open": 1,
-    //         "high": 1,
-    //         "low": 1,
-    //         "close": 1,
-    //         "volume": 1,
-    //         "last_updated": 1,
-    //         "coin": { $arrayElemAt: ["$coin", 0] }
-    //     }
+    }]).exec();
+
+    res.json(ohlcvs);
+});
+
+router.get('/chart/:symbol', async function (req, res, next) {
+    const symbol = req.params.symbol;
+    const coin = await Coin.findOne({ symbol: symbol }).exec();
+
+    if (!coin) {
+        res.status(404).json('Symbol not found');
+        return;
+    }
+
+    const limit = 25920;
+    const ohlcvs = await Ohlcv.aggregate([{
+        $match: { coin_id: coin._id }
+    }, {
+        $sort: { _id: -1 }
+    }, {
+        $limit: limit
+    }, {
+        $addFields: {
+            "entry_datetime": {
+                $dateFromParts: {
+                    "year": { $year: "$_id" },
+                    "month": { $month: "$_id" },
+                    "day": { $dayOfMonth: "$_id" },
+                    "hour": { $hour: "$_id" },
+                    "minute": { $minute: "$_id" },
+                    "second": { $second: "$_id" },
+                    "millisecond": { $millisecond: "$_id" }
+                }
+            }
+        }
     }]).exec();
 
     res.json(ohlcvs);
