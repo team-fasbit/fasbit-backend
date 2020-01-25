@@ -123,11 +123,11 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
         coinsIds.splice(0, 250),
         coinsIds
     ];
+    let corrected = [];
 
     for (let index = 0; index < coinsIdList.length; index++) {
         const cmc_ids = coinsIdList[index];
         const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(cmc_ids.join(','), fromdate, todate);
-        let corrected = [];
 
         for (let i = 0; i < coins.length; i++) {
             const cn = coins[i];
