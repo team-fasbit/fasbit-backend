@@ -117,38 +117,44 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
     const todate = req.params.todate;
     const symbols = req.body.symbols ? { symbol: { $in: req.body.symbols } } : {};
     const coins = await Coin.find(symbols).exec()
-    const cmc_ids = coins.map(x => x.cmc_id);
+    const coinsIds = coins.map(x => x.cmc_id);
     const ids = coins.map(x => mongoose.Types.ObjectId(x._id));
+    const coinsIdList = [
+        coinsIds.splice(0, 250),
+        coinsIds
+    ];
 
-    const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(cmc_ids.join(','), fromdate, todate);
-    let corrected = [];
+    coinsIdList.forEach(cmc_ids => {
+        const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(cmc_ids.join(','), fromdate, todate);
+        let corrected = [];
 
-    for (let i = 0; i < coins.length; i++) {
-        const cn = coins[i];
-        if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
-            for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
-                const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
-                if (_ohlcv.quote && _ohlcv.quote.USD) {
-                    const matchOhlcv = await Ohlcv.find({
-                        time_open: _ohlcv.time_open,
-                        time_close: _ohlcv.time_close,
-                        open: _ohlcv.quote.USD.open,
-                        high: _ohlcv.quote.USD.high,
-                        low: _ohlcv.quote.USD.low,
-                        close: _ohlcv.quote.USD.close,
-                        volume: _ohlcv.quote.USD.volume,
-                        last_updated: _ohlcv.quote.USD.timestamp,
-                        coin_id: { $nin: ids }
-                    }).exec();
-                    if (matchOhlcv.length === 1) {
-                        await Ohlcv.updateMany({ coin_id: mongoose.Types.ObjectId(matchOhlcv[0].coin_id) }, { $set: { coin_id: cn._id } }).exec();
-                        corrected.push({ symbol: cn.symbol, coin_id: matchOhlcv[0].coin_idm, j: j });
-                        break;
+        for (let i = 0; i < coins.length; i++) {
+            const cn = coins[i];
+            if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
+                for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
+                    const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
+                    if (_ohlcv.quote && _ohlcv.quote.USD) {
+                        const matchOhlcv = await Ohlcv.find({
+                            time_open: _ohlcv.time_open,
+                            time_close: _ohlcv.time_close,
+                            open: _ohlcv.quote.USD.open,
+                            high: _ohlcv.quote.USD.high,
+                            low: _ohlcv.quote.USD.low,
+                            close: _ohlcv.quote.USD.close,
+                            volume: _ohlcv.quote.USD.volume,
+                            last_updated: _ohlcv.quote.USD.timestamp,
+                            coin_id: { $nin: ids }
+                        }).exec();
+                        if (matchOhlcv.length === 1) {
+                            await Ohlcv.updateMany({ coin_id: mongoose.Types.ObjectId(matchOhlcv[0].coin_id) }, { $set: { coin_id: cn._id } }).exec();
+                            corrected.push({ symbol: cn.symbol, coin_id: matchOhlcv[0].coin_idm, j: j });
+                            break;
+                        }
                     }
                 }
             }
         }
-    }
+    });
 
     res.json({ total: corrected.length, corrected: corrected });
 });
