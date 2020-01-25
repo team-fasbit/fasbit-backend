@@ -142,8 +142,8 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
                     const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
                     if (_ohlcv.quote && _ohlcv.quote.USD) {
                         const matchOhlcv = await Ohlcv.find({
-                            time_open: _ohlcv.time_open,
-                            time_close: _ohlcv.time_close,
+                            // time_open: _ohlcv.time_open,
+                            // time_close: _ohlcv.time_close,
                             open: _ohlcv.quote.USD.open,
                             high: _ohlcv.quote.USD.high,
                             low: _ohlcv.quote.USD.low,
