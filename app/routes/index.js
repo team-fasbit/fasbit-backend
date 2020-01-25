@@ -124,7 +124,8 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
         coinsIds
     ];
 
-    coinsIdList.forEach(cmc_ids => {
+    for (let index = 0; index < coinsIdList.length; index++) {
+        const cmc_ids = coinsIdList[index];
         const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(cmc_ids.join(','), fromdate, todate);
         let corrected = [];
 
@@ -154,7 +155,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
                 }
             }
         }
-    });
+    };
 
     res.json({ total: corrected.length, corrected: corrected });
 });
