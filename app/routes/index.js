@@ -137,7 +137,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
         for (let i = 0; i < coins.length; i++) {
             const cn = coins[i];
             if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
-                console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes);
+                console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD);
                 for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
                     const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
                     if (_ohlcv.quote && _ohlcv.quote.USD) {
