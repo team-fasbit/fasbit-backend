@@ -124,7 +124,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
     //     coinsIds
     // ];
     const coinsIdList = [
-        [coinsIds[0]]
+        [coinsIds[0], coinsIds[2]]
     ];
     let corrected = [];
 
