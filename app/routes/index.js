@@ -119,9 +119,12 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
     const coins = await Coin.find(symbols).exec()
     const coinsIds = coins.map(x => x.cmc_id);
     const ids = coins.map(x => mongoose.Types.ObjectId(x._id));
+    // const coinsIdList = [
+    //     coinsIds.splice(0, 250),
+    //     coinsIds
+    // ];
     const coinsIdList = [
-        coinsIds.splice(0, 250),
-        coinsIds
+        [coinsIds[0]]
     ];
     let corrected = [];
 
@@ -134,7 +137,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
         for (let i = 0; i < coins.length; i++) {
             const cn = coins[i];
             if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
-                console.log(cn.symbol + ' > ' + ohlcvHistorical[cn.cmc_id].quotes.length)
+                console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes);
                 for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
                     const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
                     if (_ohlcv.quote && _ohlcv.quote.USD) {
@@ -149,6 +152,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
                             last_updated: _ohlcv.quote.USD.timestamp,
                             coin_id: { $nin: ids }
                         }).exec();
+                        console.log(matchOhlcv);
                         if (matchOhlcv.length === 1) {
                             try {
                                 await Ohlcv.updateMany({ coin_id: mongoose.Types.ObjectId(matchOhlcv[0].coin_id) }, { $set: { coin_id: cn._id } }).exec();
