@@ -148,7 +148,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
                             high: _ohlcv.quote.USD.high,
                             low: _ohlcv.quote.USD.low,
                             close: _ohlcv.quote.USD.close,
-                            volume: _ohlcv.quote.USD.volume,
+                            // volume: _ohlcv.quote.USD.volume,
                             last_updated: _ohlcv.quote.USD.timestamp,
                             coin_id: { $nin: ids }
                         }).exec();
