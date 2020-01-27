@@ -138,17 +138,23 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
             const cn = coins[i];
             if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
                 console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD);
+                const matchOhlcv = await Ohlcv.find({
+                    open: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.open,
+                    high: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.high,
+                    low: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.low,
+                    close: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.close,
+                    last_updated: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.timestamp,
+                    coin_id: { $nin: ids }
+                }).exec();
+                console.log(matchOhlcv);
                 for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
                     const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
                     if (_ohlcv.quote && _ohlcv.quote.USD) {
                         const matchOhlcv = await Ohlcv.find({
-                            // time_open: _ohlcv.time_open,
-                            // time_close: _ohlcv.time_close,
                             open: _ohlcv.quote.USD.open,
                             high: _ohlcv.quote.USD.high,
                             low: _ohlcv.quote.USD.low,
                             close: _ohlcv.quote.USD.close,
-                            // volume: _ohlcv.quote.USD.volume,
                             last_updated: _ohlcv.quote.USD.timestamp,
                             coin_id: { $nin: ids }
                         }).exec();
