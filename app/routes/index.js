@@ -128,7 +128,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
     ];
     let corrected = [];
 
-    console.log('BEFORE PROCESS UNKNOWN COIN_ID > ' + (await Coin.find({ coin_id: { $nin: ids } })).length);
+    console.log('BEFORE PROCESS UNKNOWN COIN_ID > ' + (await Ohlcv.find({ coin_id: { $nin: ids } })).length);
 
     for (let index = 0; index < coinsIdList.length; index++) {
         const cmc_ids = coinsIdList[index];
@@ -174,7 +174,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
         }
     }
 
-    console.log('AFTER PROCESS UNKNOWN COIN_ID > ' + (await Coin.find({ coin_id: { $nin: ids } })).length);
+    console.log('AFTER PROCESS UNKNOWN COIN_ID > ' + (await Ohlcv.find({ coin_id: { $nin: ids } })).length);
 
     res.json({ total: corrected.length, corrected: corrected });
 });
