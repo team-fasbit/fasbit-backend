@@ -112,71 +112,56 @@ router.get('/chart/:symbol', async function (req, res, next) {
 });
 
 
-router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, next) {
-    const fromdate = req.params.fromdate;
-    const todate = req.params.todate;
-    const symbols = req.body.symbols ? { symbol: { $in: req.body.symbols } } : {};
-    const coins = await Coin.find(symbols).exec()
-    const coinsIds = coins.map(x => x.cmc_id);
-    const ids = coins.map(x => mongoose.Types.ObjectId(x._id));
-    // const coinsIdList = [
-    //     coinsIds.splice(0, 250),
-    //     coinsIds
-    // ];
-    const coinsIdList = [
-        [coinsIds[0], coinsIds[2]]
-    ];
-    let corrected = [];
+// router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, next) {
+//     const fromdate = req.params.fromdate;
+//     const todate = req.params.todate;
+//     const symbols = req.body.symbols ? { symbol: { $in: req.body.symbols } } : {};
+//     const coins = await Coin.find(symbols).exec()
+//     const coinsIds = coins.map(x => x.cmc_id);
+//     const ids = coins.map(x => mongoose.Types.ObjectId(x._id));
+//     const coinsIdList = [
+//         coinsIds.splice(0, 250),
+//         coinsIds
+//     ];
+//     let corrected = [];
 
-    console.log('BEFORE PROCESS UNKNOWN COIN_ID > ', (await Ohlcv.countDocuments({ coin_id: { $nin: ids } })));
+//     console.log('BEFORE PROCESS UNKNOWN COIN_ID > ', (await Ohlcv.countDocuments({ coin_id: { $nin: ids } })));
 
-    for (let index = 0; index < coinsIdList.length; index++) {
-        const cmc_ids = coinsIdList[index];
-        const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(cmc_ids.join(','), fromdate, todate);
+//     for (let index = 0; index < coinsIdList.length; index++) {
+//         const cmc_ids = coinsIdList[index];
+//         const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(cmc_ids.join(','), fromdate, todate);
 
-        for (let i = 0; i < coins.length; i++) {
-            const cn = coins[i];
-            if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
-                console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD);
-                const matchOhlcv = await Ohlcv.countDocuments({
-                    open: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.open,
-                    high: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.high,
-                    low: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.low,
-                    close: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.close,
-                    last_updated: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.timestamp,
-                    coin_id: { $nin: ids }
-                });
-                console.log(matchOhlcv);
-                for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
-                    const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
-                    if (_ohlcv.quote && _ohlcv.quote.USD) {
-                        const matchOhlcv = await Ohlcv.find({
-                            open: _ohlcv.quote.USD.open,
-                            high: _ohlcv.quote.USD.high,
-                            low: _ohlcv.quote.USD.low,
-                            close: _ohlcv.quote.USD.close,
-                            last_updated: _ohlcv.quote.USD.timestamp,
-                            coin_id: { $nin: ids }
-                        }).exec();
-                        console.log(matchOhlcv);
-                        if (matchOhlcv.length === 1) {
-                            try {
-                                await Ohlcv.updateMany({ coin_id: mongoose.Types.ObjectId(matchOhlcv[0].coin_id) }, { $set: { coin_id: cn._id } }).exec();
-                                corrected.push({ symbol: cn.symbol, coin_id: matchOhlcv[0].coin_idm, j: j });
-                            } catch (error) {
-                                console.error(error);
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+//         for (let i = 0; i < coins.length; i++) {
+//             const cn = coins[i];
+//             if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
+//                 for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
+//                     const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
+//                     if (_ohlcv.quote && _ohlcv.quote.USD) {
+//                         const matchOhlcv = await Ohlcv.find({
+//                             open: _ohlcv.quote.USD.open,
+//                             high: _ohlcv.quote.USD.high,
+//                             low: _ohlcv.quote.USD.low,
+//                             close: _ohlcv.quote.USD.close,
+//                             coin_id: { $nin: ids }
+//                         }).exec();
+//                         if (matchOhlcv.length === 1) {
+//                             try {
+//                                 await Ohlcv.updateMany({ coin_id: mongoose.Types.ObjectId(matchOhlcv[0].coin_id) }, { $set: { coin_id: cn._id } }).exec();
+//                                 corrected.push({ symbol: cn.symbol, coin_id: matchOhlcv[0].coin_idm, j: j });
+//                             } catch (error) {
+//                                 console.error(error);
+//                             }
+//                             break;
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
 
-    console.log('AFTER PROCESS UNKNOWN COIN_ID > ', (await Ohlcv.countDocuments({ coin_id: { $nin: ids } })));
+//     console.log('AFTER PROCESS UNKNOWN COIN_ID > ', (await Ohlcv.countDocuments({ coin_id: { $nin: ids } })));
 
-    res.json({ total: corrected.length, corrected: corrected });
-});
+//     res.json({ total: corrected.length, corrected: corrected });
+// });
 
 module.exports = router;
