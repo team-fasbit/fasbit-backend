@@ -10,7 +10,7 @@ var loadOhlcvToday = require('../processes/loadOhlcvToday');
 var Coin = require('../models/Coin');
 var Ohlcv = require('../models/Ohlcv');
 
-var coinMarketCapAPI = require('../helpers/coinMarketCapAPI');
+// var coinMarketCapAPI = require('../helpers/coinMarketCapAPI');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -71,6 +71,33 @@ router.post('/list-ohlcv', async function (req, res, next) {
         $skip: skip
     }, {
         $limit: limit
+    }]).exec();
+
+    res.json(ohlcvs);
+});
+
+router.post('/list-ohlcv-history', async function (req, res, next) {
+    const symbol = req.body.symbol || false;
+    if (symbol === false) {
+        res.status(400).json('Symbol is required');
+        return;
+    }
+
+    const coin = await Coin.findOne({ symbol: symbol }).exec();
+
+    if (!coin) {
+        res.status(404).json('Symbol not found');
+        return;
+    }
+
+    const ohlcvs = await Ohlcv.aggregate([{
+        $match: {
+            coin_id: coin._id,
+            last_updated: { $gte: '2020-01-14T00:00:00.000Z' },
+            last_updated: { $lte: '2020-01-14T59:59:59.999Z' }
+        }
+    }, {
+        $sort: { _id: -1 }
     }]).exec();
 
     res.json(ohlcvs);
