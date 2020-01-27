@@ -138,14 +138,14 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
             const cn = coins[i];
             if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
                 console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD);
-                const matchOhlcv = await Ohlcv.count({
+                const matchOhlcv = await Ohlcv.countDocuments({
                     open: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.open,
                     high: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.high,
                     low: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.low,
                     close: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.close,
                     last_updated: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.timestamp,
                     coin_id: { $nin: ids }
-                }).exec();
+                });
                 console.log(matchOhlcv);
                 for (let j = 0; j < ohlcvHistorical[cn.cmc_id].quotes.length; j++) {
                     const _ohlcv = ohlcvHistorical[cn.cmc_id].quotes[j];
