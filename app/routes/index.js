@@ -128,7 +128,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
     ];
     let corrected = [];
 
-    console.log('BEFORE PROCESS UNKNOWN COIN_ID > ' + (await Ohlcv.find({ coin_id: { $nin: ids } })).length);
+    console.log('BEFORE PROCESS UNKNOWN COIN_ID > ' + (await Ohlcv.count({ coin_id: { $nin: ids } })).exec());
 
     for (let index = 0; index < coinsIdList.length; index++) {
         const cmc_ids = coinsIdList[index];
@@ -138,7 +138,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
             const cn = coins[i];
             if (ohlcvHistorical[cn.cmc_id] && ohlcvHistorical[cn.cmc_id].quotes) {
                 console.log(cn.symbol + ' > ', ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD);
-                const matchOhlcv = await Ohlcv.find({
+                const matchOhlcv = await Ohlcv.count({
                     open: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.open,
                     high: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.high,
                     low: ohlcvHistorical[cn.cmc_id].quotes[0].quote.USD.low,
@@ -174,7 +174,7 @@ router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, n
         }
     }
 
-    console.log('AFTER PROCESS UNKNOWN COIN_ID > ' + (await Ohlcv.find({ coin_id: { $nin: ids } })).length);
+    console.log('AFTER PROCESS UNKNOWN COIN_ID > ' + (await Ohlcv.count({ coin_id: { $nin: ids } })).exec());
 
     res.json({ total: corrected.length, corrected: corrected });
 });
