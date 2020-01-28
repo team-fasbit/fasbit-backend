@@ -13,8 +13,8 @@ module.exports = () => {
         logger.info('loadOhlcv process initialized');
 
         // Once Every Sunday
-        // new CronJob('0 0 * * 0', refreshTop500, null, true);
-        // logger.info('refreshTop500 process initialized');
+        new CronJob('0 0 * * 0', refreshTop500, null, true);
+        logger.info('refreshTop500 process initialized');
 
         // Once Every Sunday
         // new CronJob('*/5 * * * *', loadQuotes, null, true);

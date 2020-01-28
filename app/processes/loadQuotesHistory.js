@@ -10,7 +10,7 @@ module.exports = async () => {
     logger.info('loadQuotesHistory process start');
 
     try {
-        var coins = await Coin.find({}).select({ cmc_id: 1 }).exec();
+        var coins = await Coin.find({ active: true }).select({ cmc_id: 1 }).exec();
         var coinsIds = coins.map(v => v.cmc_id);
         const coinsIdList = [
             coinsIds.splice(0, 250),

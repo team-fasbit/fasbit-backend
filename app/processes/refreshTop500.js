@@ -7,9 +7,9 @@ module.exports = async () => {
     logger.info('refreshTop500 process start');
 
     try {
-        await Coin.deleteMany({}).exec();
-
         const listingLatest = await coinMarketCapAPI.listingLatest();
+        var receivedCoins = {};
+        var latestCoins = [];
         var coins = [];
 
         if (listingLatest && Array.isArray(listingLatest) && listingLatest.length > 0) {
@@ -27,6 +27,7 @@ module.exports = async () => {
                     last_updated: listedCoin.last_updated,
                     date_added: listedCoin.date_added,
                     tags: listedCoin.tags,
+                    active: true
                 };
                 if (listedCoin.quote && listedCoin.quote.USD) {
                     insertCoin = {
@@ -40,10 +41,21 @@ module.exports = async () => {
                         quote_last_updated: listedCoin.quote.USD.last_updated
                     };
                 }
-                coins.push(insertCoin);
+                latestCoins.push(listedCoin.symbol);
+                receivedCoins[listedCoin.symbol] = insertCoin;
+            });
+            const needToInsert = (await Coin.find({ symbol: { $nin: latestCoins } }).exec()).map(x => x.symbol);
+
+            const coinActivated = await Coin.updateMany({ active: false, symbol: { $in: latestCoins } }, { $set: { active: true } }).exec();
+            const coinDeactivated = await Coin.updateMany({ active: true, symbol: { $nin: latestCoins } }, { $set: { active: false } }).exec();
+
+            needToInsert.forEach(symbol => {
+                coins.push(latestCoins[symbol]);
             });
 
-            const insert = await Coin.collection.insertMany(coins);
+            if (coins.length) {
+                const insert = await Coin.insertMany(coins);
+            }
         } else {
             logger.error('listingLatest conditions rejected');
         }

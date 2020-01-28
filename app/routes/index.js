@@ -43,7 +43,7 @@ router.post('/delete-ohlcv', async function (req, res, next) {
 });
 
 router.post('/list-coins', async function (req, res, next) {
-    const coins = await Coin.find().exec();
+    const coins = await Coin.find({ active: true }).exec();
     res.json(coins);
 });
 
@@ -136,6 +136,11 @@ router.get('/chart/:symbol', async function (req, res, next) {
     }]).exec();
 
     res.json(ohlcvs);
+});
+
+router.post('/add-active-on-coins', async function (req, res, next) {
+    await Coin.updateMany({}, { $set: { active: true } }).exec();
+    res.json([]);
 });
 
 

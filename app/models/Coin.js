@@ -21,7 +21,8 @@ var coinSchema = new Schema({
     percent_change_24h: { type: Number },
     percent_change_7d: { type: Number },
     market_cap: { type: Number },
-    quote_last_updated: { type: Date }
+    quote_last_updated: { type: Date },
+    active: { type: Boolean, required: true }
 });
 
 module.exports = mongoose.model('Coin', coinSchema, 'coins');

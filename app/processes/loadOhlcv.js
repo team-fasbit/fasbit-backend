@@ -7,7 +7,7 @@ var Ohlcv = require('../models/Ohlcv');
 module.exports = async () => {
     logger.info('loadOhlcv process start');
     try {
-        var coins = await Coin.find({}).select({ cmc_id: 1 }).exec();
+        var coins = await Coin.find({ active: true }).select({ cmc_id: 1 }).exec();
         var coinsIds = coins.map(v => v.cmc_id);
         const ohlcvLatest = await coinMarketCapAPI.ohlcvLatest(coinsIds.join(','));
         var ohlcvs = [];
@@ -16,7 +16,7 @@ module.exports = async () => {
             const id = coin.cmc_id;
             if (ohlcvLatest[id]) {
                 const _ohlcv = ohlcvLatest[id];
-                
+
                 if (_ohlcv.quote && _ohlcv.quote.USD) {
                     ohlcvs.push({
                         time_open: _ohlcv.time_open,

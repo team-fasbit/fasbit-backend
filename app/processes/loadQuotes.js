@@ -8,7 +8,7 @@ module.exports = async () => {
     logger.info('loadQuotes process start');
 
     try {
-        var coins = await Coin.find({}).select({ cmc_id: 1 }).exec();
+        var coins = await Coin.find({ active: true }).select({ cmc_id: 1 }).exec();
         var coinsIds = coins.map(v => v.cmc_id);
         const quotesLatest = await coinMarketCapAPI.quotesLatest(coinsIds.join(','));
         var quotes = [];
