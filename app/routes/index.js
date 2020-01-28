@@ -138,11 +138,6 @@ router.get('/chart/:symbol', async function (req, res, next) {
     res.json(ohlcvs);
 });
 
-router.post('/add-active-on-coins', async function (req, res, next) {
-    await Coin.updateMany({}, { $set: { active: true } }).exec();
-    res.json([]);
-});
-
 
 // router.post('/coin-id-correction/:fromdate/:todate', async function (req, res, next) {
 //     const fromdate = req.params.fromdate;
