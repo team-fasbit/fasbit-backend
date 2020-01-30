@@ -1,5 +1,6 @@
 var express = require('express');
-var mongoose = require('mongoose');
+// var mongoose = require('mongoose');
+var moment = require('moment');
 var router = express.Router();
 
 var refreshTop500 = require('../processes/refreshTop500');
@@ -9,6 +10,7 @@ var loadOhlcvToday = require('../processes/loadOhlcvToday');
 
 var Coin = require('../models/Coin');
 var Ohlcv = require('../models/Ohlcv');
+var OhlcvHourly = require('../models/OhlcvHourly');
 
 // var coinMarketCapAPI = require('../helpers/coinMarketCapAPI');
 
@@ -103,6 +105,41 @@ router.post('/list-ohlcv-history', async function (req, res, next) {
     res.json(ohlcvs);
 });
 
+// router.get('/chart/:symbol', async function (req, res, next) {
+//     const symbol = req.params.symbol;
+//     const coin = await Coin.findOne({ symbol: symbol }).exec();
+
+//     if (!coin) {
+//         res.status(404).json('Symbol not found');
+//         return;
+//     }
+
+//     const limit = 25920;
+//     const ohlcvs = await Ohlcv.aggregate([{
+//         $match: { coin_id: coin._id }
+//     }, {
+//         $sort: { _id: -1 }
+//     }, {
+//         $limit: limit
+//     }, {
+//         $addFields: {
+//             "entry_datetime": {
+//                 $dateFromParts: {
+//                     "year": { $year: "$_id" },
+//                     "month": { $month: "$_id" },
+//                     "day": { $dayOfMonth: "$_id" },
+//                     "hour": { $hour: "$_id" },
+//                     "minute": { $minute: "$_id" },
+//                     "second": { $second: "$_id" },
+//                     "millisecond": { $millisecond: "$_id" }
+//                 }
+//             }
+//         }
+//     }]).exec();
+
+//     res.json(ohlcvs);
+// });
+
 router.get('/chart/:symbol', async function (req, res, next) {
     const symbol = req.params.symbol;
     const coin = await Coin.findOne({ symbol: symbol }).exec();
@@ -112,11 +149,14 @@ router.get('/chart/:symbol', async function (req, res, next) {
         return;
     }
 
-    const limit = 25920;
-    const ohlcvs = await Ohlcv.aggregate([{
-        $match: { coin_id: coin._id }
+    const limit = 24;
+    const ohlcvs = await OhlcvHourly.aggregate([{
+        $match: {
+            coin_id: coin._id,
+            last_updated: { $gte: moment().subtract(1, 'days').millisecond(0).second(0).minute(0).hour(0).utc().toISOString() }
+        }
     }, {
-        $sort: { _id: -1 }
+        $sort: { _id: 1 }
     }, {
         $limit: limit
     }, {

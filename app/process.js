@@ -5,6 +5,7 @@ var logger = require('./helpers/logger');
 var loadOhlcv = require('./processes/loadOhlcv');
 var refreshTop500 = require('./processes/refreshTop500');
 var loadQuotes = require('./processes/loadQuotes');
+var loadHourlyData24h = require('./processes/loadHourlyData24h');
 
 module.exports = () => {
     if (process.env.RUN_PROCESS == "TRUE") {
@@ -19,5 +20,9 @@ module.exports = () => {
         // Once Every Sunday
         // new CronJob('*/5 * * * *', loadQuotes, null, true);
         // logger.info('loadQuotes process initialized');
+
+        // Once Every Day
+        new CronJob('0 0 * * *', loadHourlyData24h, null, true);
+        logger.info('loadHourlyData24h process initialized');
     }
 };
