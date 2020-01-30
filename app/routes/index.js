@@ -159,20 +159,6 @@ router.get('/chart/:symbol', async function (req, res, next) {
         $sort: { _id: 1 }
     }, {
         $limit: limit
-    }, {
-        $addFields: {
-            "entry_datetime": {
-                $dateFromParts: {
-                    "year": { $year: "$_id" },
-                    "month": { $month: "$_id" },
-                    "day": { $dayOfMonth: "$_id" },
-                    "hour": { $hour: "$_id" },
-                    "minute": { $minute: "$_id" },
-                    "second": { $second: "$_id" },
-                    "millisecond": { $millisecond: "$_id" }
-                }
-            }
-        }
     }]).exec();
 
     res.json(ohlcvs);
