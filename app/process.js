@@ -22,7 +22,7 @@ module.exports = () => {
         // logger.info('loadQuotes process initialized');
 
         // Once Every Day
-        new CronJob('0 0 * * *', loadHourlyData24h, null, true);
+        new CronJob('0 1 * * *', loadHourlyData24h, null, true);
         logger.info('loadHourlyData24h process initialized');
     }
 };
