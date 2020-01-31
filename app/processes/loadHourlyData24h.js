@@ -16,10 +16,11 @@ module.exports = async () => {
             coins
         ];
         const time_start = moment().subtract(1, 'days').utc().format('YYYY-MM-DD');
-        logger.info(`fetching OHLCV data for date from ${time_start}`);
+        const time_end = moment().utc().format('YYYY-MM-DD');
+        logger.info(`fetching OHLCV data for dates between ${time_start} and ${time_end}`);
         for (let i = 0; i < coinsList.length; i++) {
             var coinsIds = coinsList[i].map(v => v.cmc_id);
-            const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(coinsIds.join(','), time_start);
+            const ohlcvHistorical = await coinMarketCapAPI.ohlcvHistorical(coinsIds.join(','), time_start, time_end);
             var ohlcvs = [];
 
             coinsList[i].forEach(coin => {
