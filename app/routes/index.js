@@ -149,16 +149,13 @@ router.get('/chart/:symbol', async function (req, res, next) {
         return;
     }
 
-    const limit = 24;
     const ohlcvs = await OhlcvHourly.aggregate([{
         $match: {
             coin_id: coin._id,
-            last_updated: { $gte: moment().subtract(1, 'days').millisecond(0).second(0).minute(0).hour(0).utc().toISOString() }
+            last_updated: { $gte: moment().subtract(90, 'days').millisecond(0).second(0).minute(0).hour(0).utc().toISOString() }
         }
     }, {
         $sort: { _id: 1 }
-    }, {
-        $limit: limit
     }]).exec();
 
     res.json(ohlcvs);
