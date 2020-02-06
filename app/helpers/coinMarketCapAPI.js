@@ -145,5 +145,36 @@ module.exports = {
             logger.error(err.message);
             return false;
         }
+    },
+
+    ohlcvLastHistorical: async (coin_id, time_end) => {
+        try {
+            var qs = {
+                id: coin_id,
+                time_end: time_end,
+                time_period: 'hourly',
+                interval: '1h',
+                count: 1
+            };
+
+            const result = await rp.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical', {
+                qs: qs,
+                headers: {
+                    'X-CMC_PRO_API_KEY': API_KEY
+                },
+                json: true,
+                gzip: true
+            });
+
+            if (result && result.data && result.status && result.status.error_code != undefined && result.status.error_code === 0) {
+                return result.data;
+            } else if (result.status && result.status.error_message) {
+                logger.error(result.status.error_message);
+            }
+            return false;
+        } catch (err) {
+            logger.error(err.message);
+            return false;
+        }
     }
 };

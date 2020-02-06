@@ -7,7 +7,7 @@ var Coin = require('../models/Coin');
 var OhlcvHourly = require('../models/OhlcvHourly');
 
 module.exports = async () => {
-    logger.info('loadHourlyData24h process start');
+    logger.info('loadHourlyDataToday process start');
 
     try {
         var coins = await Coin.find({ active: true }).select({ cmc_id: 1 }).exec();
@@ -15,8 +15,8 @@ module.exports = async () => {
             coins.splice(0, 250),
             coins
         ];
-        const time_start = moment().subtract(1, 'days').utc().format('YYYY-MM-DD');
-        const time_end = moment().utc().format('YYYY-MM-DD');
+        const time_start = moment().utc().format('YYYY-MM-DD');
+        const time_end = moment().add(1, 'day').utc().format('YYYY-MM-DD');
         logger.info(`fetching OHLCV data for dates between ${time_start} and ${time_end}`);
         for (let i = 0; i < coinsList.length; i++) {
             var coinsIds = coinsList[i].map(v => v.cmc_id);
@@ -51,8 +51,8 @@ module.exports = async () => {
 
     } catch (err) {
         console.log(err);
-        logger.error('Error while processing loadHourlyData24h');
+        logger.error('Error while processing loadHourlyDataToday');
     }
 
-    logger.info('loadHourlyData24h process stop');
+    logger.info('loadHourlyDataToday process stop');
 };
