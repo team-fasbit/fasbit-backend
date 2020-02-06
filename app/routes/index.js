@@ -8,7 +8,6 @@ var loadOhlcvHistory = require('../processes/loadOhlcvHistory');
 var loadOhlcvToday = require('../processes/loadOhlcvToday');
 var loadOHLCVHourly = require('../processes/loadOHLCVHourly');
 // var loadQuotesHistory = require('../processes/loadQuotesHistory');
-var loadHourlyDataToday = require('../processes/loadHourlyDataToday');
 
 var Coin = require('../models/Coin');
 var Ohlcv = require('../models/Ohlcv');
@@ -39,11 +38,6 @@ router.post('/load-coins-today', function (req, res, next) {
 router.post('/load-hourly-24h', function (req, res, next) {
     loadOHLCVHourly();
     res.send('load-hourly-24h');
-});
-
-router.post('/load-todays-hourly-ohlcv', function (req, res, next) {
-    loadHourlyDataToday();
-    res.json('load-todays-hourly-ohlcv');
 });
 
 // router.post('/load-quotes-history', function (req, res, next) {
