@@ -16,7 +16,7 @@ module.exports = async () => {
             coins
         ];
         const time_end = moment().subtract(5, 'minutes').utc().format('YYYY-MM-DD');
-        logger.info(`fetching OHLCV data for dates between ${time_start} and ${time_end}`);
+        logger.info(`fetching Last OHLCV data for date ${time_end}`);
         for (let i = 0; i < coinsList.length; i++) {
             var coinsIds = coinsList[i].map(v => v.cmc_id);
             const ohlcvHistorical = await coinMarketCapAPI.ohlcvLastHistorical(coinsIds.join(','), time_end);
