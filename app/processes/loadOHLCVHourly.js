@@ -15,7 +15,7 @@ module.exports = async () => {
             coins.splice(0, 250),
             coins
         ];
-        const time_end = moment().subtract(5, 'minutes').utc().format('YYYY-MM-DD');
+        const time_end = moment().add(1, 'day').utc().format('YYYY-MM-DD');
         logger.info(`fetching Last OHLCV data for date ${time_end}`);
         for (let i = 0; i < coinsList.length; i++) {
             var coinsIds = coinsList[i].map(v => v.cmc_id);
