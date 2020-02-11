@@ -186,7 +186,7 @@ router.get('/chart/:symbol', async function (req, res, next) {
             last_updated: { $gte: moment().subtract(90, 'days').millisecond(0).second(0).minute(0).hour(0).utc().toISOString() }
         }
     }, {
-        $sort: { _id: 1 }
+        $sort: { last_updated: 1 }
     }]).exec();
 
     res.json(ohlcvs);
