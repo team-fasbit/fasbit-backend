@@ -8,6 +8,7 @@ var loadOhlcvHistory = require('../processes/loadOhlcvHistory');
 var loadOhlcvToday = require('../processes/loadOhlcvToday');
 var loadOHLCVHourly = require('../processes/loadOHLCVHourly');
 // var loadQuotesHistory = require('../processes/loadQuotesHistory');
+var loadHourlyDataDateRange = require('../processes/loadHourlyDataDateRange');
 
 var Coin = require('../models/Coin');
 var Ohlcv = require('../models/Ohlcv');
@@ -18,6 +19,16 @@ var OhlcvHourly = require('../models/OhlcvHourly');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     res.send('API is Online');
+});
+
+router.get('/coins', async function (req, res, next) {
+    res.send(await Coin.aggregate([{
+        $match: { active: true }
+    }, {
+        $group: { _id: '$cmc_id', count: { $sum: 1 } }
+    }, {
+        $sort: { coint: -1 }
+    }]).exec());
 });
 
 router.post('/refresh-top-500', function (req, res, next) {
@@ -44,6 +55,20 @@ router.post('/load-hourly-24h', function (req, res, next) {
 //     loadQuotesHistory();
 //     res.send('load-quotes');
 // });
+
+router.post('/load-hourly-data-date-range', function (req, res, next) {
+    const from = req.body.from || false;
+    const to = req.body.to || false;
+    if (from && to && from < to) {
+        // var time_start = moment(from, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        // var time_end = moment(time_start, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
+        loadHourlyDataDateRange(from, to);
+        res.send('load-hourly-data-date-range');
+        // res.send({ time_start, time_end });
+    } else {
+        res.send('from and to required');
+    }
+});
 
 router.post('/delete-ohlcv', async function (req, res, next) {
     await Ohlcv.deleteMany({});

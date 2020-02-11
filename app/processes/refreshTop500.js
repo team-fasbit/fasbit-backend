@@ -41,16 +41,18 @@ module.exports = async () => {
                         quote_last_updated: listedCoin.quote.USD.last_updated
                     };
                 }
-                latestCoins.push(listedCoin.symbol);
-                receivedCoins[listedCoin.symbol] = insertCoin;
+                latestCoins.push(listedCoin.id);
+                receivedCoins[listedCoin.id] = insertCoin;
             });
-            const needToInsert = (await Coin.find({ symbol: { $nin: latestCoins } }).exec()).map(x => x.symbol);
+            const existingCoins = (await Coin.find({}).exec()).map(x => x.cmc_id);
 
-            const coinActivated = await Coin.updateMany({ active: false, symbol: { $in: latestCoins } }, { $set: { active: true } }).exec();
-            const coinDeactivated = await Coin.updateMany({ active: true, symbol: { $nin: latestCoins } }, { $set: { active: false } }).exec();
+            const coinActivated = await Coin.updateMany({ active: false, cmc_id: { $in: latestCoins } }, { $set: { active: true } }).exec();
+            const coinDeactivated = await Coin.updateMany({ active: true, cmc_id: { $nin: latestCoins } }, { $set: { active: false } }).exec();
 
-            needToInsert.forEach(symbol => {
-                coins.push(latestCoins[symbol]);
+            latestCoins.forEach(coin => {
+                if (!existingCoins.includes(coin)) {
+                    coins.push(receivedCoins[coin]);
+                }
             });
 
             if (coins.length) {
